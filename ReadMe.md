@@ -1,4 +1,4 @@
-# Data Pipelines with Apache Airflow Project
+# Udacity Data Engineering Nanodegree | Capstone Project
 
 ## Description
 
@@ -9,23 +9,7 @@ Sparkify, A music streaming company, decided to use Apache Airflow to automate a
 
 Source datasets are available as JSON logs in S3 and this Airflow-enabled ETL loads & processes this data in AWS Redshift.
 
-## Data
-
-### Song Dataset
-
-Here's an example of what a song JSON contains:
-
-```json
-{"num_songs": 1, "artist_id": "ARJIE2Y1187B994AB7", "artist_latitude": null,
-"artist_longitude": null, "artist_location": "", "artist_name": "Line Renaud",
-"song_id": "SOUPIRU12A6D4FA1E1", "title": "Der Kleine Dompfaff", "duration":
-152.92036, "year": 0}
-```
-
-### Log Dataset
-
-Here's an example of what a log JSON contains:
-![JSON!](./img/log-data.png "JSON-log")
+---
 
 ## Project Files
 
@@ -50,31 +34,48 @@ Here's an example of what a log JSON contains:
     │    
     └── ReadMe.md                       # This ReadMe.md file
 
-## DAG Configuration
+---
 
-**Configuration of task dependencies in `sparkify_dag.py`:**
-```
-start_operator  >> [stage_events_to_redshift, 
-                    stage_songs_to_redshift] >> \
-load_songplays_table >> [load_user_dimension_table, 
-                         load_song_dimension_table, 
-                         load_artist_dimension_table, 
-                         load_time_dimension_table] >> \
-run_data_quality_checks >> end_operator
-```
+## Data Model & Dictionary
+![DataModel!](./img/DataModel-Data-Eng-Capstone-Project.png "Data Model")
 
-**Graph view of task dependencies**:
-![DAG!](./img/sparkify-dag.png "sparkify-dag")
+![DataDictionary!](./img/DataDictionary.png "Data Dictionary")
 
-## Airflow Connections
+---
 
-You'll need to add your AWS IAM credentials and Redshift config following these steps in the Airflow UI:
+## ETL
 
-1. Admin tab -> Connections
-![admin connections!](./img/airflow-connections.png "admin connections")
+The pipeline collects source data from 3 locations, processes it, and saves it as parquet files locally. Afterwards, the processed data is uploaded to Amazon S3. The pattern for processing each table is as follows:
 
-2. Connections -> Create -> Insert AWS IAM Credentials
-![admin connections!](./img/airflow-connections-IAM.png "admin connections IAM")
+1. Reading raw data
+2. Transforming the data
+3. Verifying the accuracy of the processed data
+4. Saving the processed data in the output folder in parquet format
 
-3. Connections -> Create -> Insert AWS Redshift Credentials
-![admin connections!](./img/airflow-connections-Redshift.png "admin connections Redshift")
+The project utilizes several tools, including:
+- Apache Spark for processing large data sets
+- Pandas for easily reading HTML tables
+- Amazon S3 for scalable, reliable, fast, and cost-effective storage
+
+Running the pipeline requires 2 further simple steps:
+1. Configure the dl.cfg file, using an IAM User with only AmazonS3FullAccess policy for the KEY and SECRET fields and the S3 bucket name for the S3 field.
+2. Head to the project's root directory and run the command `python -m etl`.
+
+---
+
+## Further Considerations
+
+**1. Scaling the data** \
+If the data volume was increased 100x and Spark is in standalone server mode we should consider using AWS EMR for distributed data processing on the cloud.
+
+**2. A daily 7:00 AM SLA for a dashboard relying on this data** \
+Apache Airflow could be used to build an ETL pipeline to regularly update the data and populate the dashboard. Apache Airflow is Python native and integrates well with AWS allowing for quick and easy orchestration.
+
+**3. Database accessibility to over 100 people** \
+AWS Redshift can handle up to 500 connections, making it a suitable solution for this requirement. However, a cost/benefit analysis should be conducted before implementing this cloud-based solution.
+
+**4. Mismatch in timeframe across datasets** \
+The immigration dataset is from 2016 while the last year in the temperature dataset is 2013 meaning the latter can't be used to observe temperature changes in 2016.
+
+**5. Missing state & city data** \
+The label description file is missing state and city information making it difficult to join immigration and demographic tables.
