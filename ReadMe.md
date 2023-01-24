@@ -2,37 +2,19 @@
 
 ## Description
 
-Sparkify, A music streaming company, decided to use Apache Airflow to automate and monitor their ETL pipelines. Airflow enriches their ETL given it enables:
-* Historical back-filling of data
-* Reusable code to replicate, tweak, and apply to similar tasks eliminating verbosity  
-* Orchestration monitoring to easily diagnose and debug failed steps of the automated orchestration
+The goal of this initiative is to provide answers to questions regarding immigration in the United States. This includes: 
 
-Source datasets are available as JSON logs in S3 and this Airflow-enabled ETL loads & processes this data in AWS Redshift.
+* Identifying the most popular cities for immigration
+* Analyzing the gender and visa type distribution of immigrants
+* Determining the average age and temperature per month per city. 
 
----
+I gather information from a variety of sources, including:
 
-## Project Files
+* I94 immigration dataset from 2016
+* City temperature data from Kaggle
+* Demographic information from OpenSoft
 
-    .
-    │    
-    ├── dags                            
-    │   └── sparkify_dag.py             # Main DAG file with all imports, tasks, operators, and dependencies
-    │
-    │── plugins                         
-    │   └── helpers                     
-    │   │   └── sql_queries.py          # SQL syntax for inserting data into created tables
-    │   └── operators                   
-    │       ├── data_quality.py         # Class object that runs data quality checks 
-    │       ├── load_dimension.py       # DAG Operator that loads data into dimension tables
-    │       ├── load_fact.py            # DAG Operator that loads data into fact table
-    │       └── stage_redshift.py       # Copies data from S3 to Redshift
-    │    
-    │── create_tables.py                # SQL syntax to create desired tables in Redshift
-    │    
-    ├── img                             # Images used in this ReadMe.md file
-    │   └── ...                         # ...
-    │    
-    └── ReadMe.md                       # This ReadMe.md file
+My approach involves creating 7 dimension tables and 1 fact table for immigration. I utilize Spark for data extraction, transformation, and loading tasks, and store the final results in the Parquet format for further analysis.
 
 ---
 
